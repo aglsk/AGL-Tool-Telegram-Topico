@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enviar Mensagem</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding-top: 50px;
+        }
+        .container {
+            max-width: 400px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        .title {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            font-weight: bold;
+        }
+        .submit-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+        .submit-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="title">Enviar Mensagem</div>
+    <form id="sendMessageForm">
+        <div class="form-group">
+            <label for="chatId">ChatID:</label>
+            <input class="form-control" type="text" id="chatId" name="chatId" placeholder="Informe o ChatID">
+        </div>
+        <div class="form-group">
+            <label for="token">Token:</label>
+            <input class="form-control" type="text" id="token" name="token" placeholder="Informe o Token">
+        </div>
+        <div class="form-group">
+            <label for="message">Mensagem:</label>
+            <textarea class="form-control" id="message" name="message" rows="4" placeholder="Digite sua mensagem"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="topicId">ID do Tópico:</label>
+            <input class="form-control" type="text" id="topicId" name="topicId" placeholder="Informe o ID do Tópico">
+        </div>
+        <button type="button" class="submit-btn" onclick="sendMessage()">Enviar</button>
+    </form>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+function sendMessage() {
+    var chatId = document.getElementById("chatId").value;
+    var token = document.getElementById("token").value;
+    var message = document.getElementById("message").value;
+    var topicId = document.getElementById("topicId").value;
+
+    if (chatId.trim() === "" || token.trim() === "" || message.trim() === "" || topicId.trim() === "") {
+        alert("Por favor, preencha todos os campos!");
+        return;
+    }
+
+    var request = new XMLHttpRequest();
+    var url = "https://api.telegram.org/bot" + token + "/sendMessage";
+    var params = "chat_id=" + chatId + "&text=" + message + "&message_thread_id=" + topicId;
+
+    request.open("POST", url, true);
+    request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+    request.onreadystatechange = function() {
+        if (request.readyState === 4 && request.status === 200) {
+            alert("Mensagem enviada com sucesso!");
+        }
+    };
+
+    request.send(params);
+}
+</script>
+</body>
+</html>
