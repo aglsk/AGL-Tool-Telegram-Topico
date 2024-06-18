@@ -46,8 +46,8 @@
     <div class="title">Enviar Mensagem BOT</div>
     <form id="sendMessageForm">
         <div class="form-group">
-            <label for="chatId">ChatID: (Obs:.. Coloque o "-100" Antes Do ID )</label>
-            <input class="form-control" type="text" id="chatId" name="chatId" placeholder="Informe o ChatID">
+            <label for="chatId">ChatID:</label>
+            <input class="form-control" type="text" id="chatId" name="chatId" placeholder="Informe o ChatID(Obs:.. Coloque o '-100' Antes Do ID ) ">
         </div>
         <div class="form-group">
             <label for="token">Token:</label>
@@ -58,7 +58,7 @@
             <textarea class="form-control" id="message" name="message" rows="4" placeholder="Digite sua mensagem"></textarea>
         </div>
         <div class="form-group">
-            <label for="topicId">ID do Tópico: ( Caso Não Tenha Topico Desconsiderar )</label>
+            <label for="topicId">ID do Tópico:</label>
             <input class="form-control" type="text" id="topicId" name="topicId" placeholder="Informe o ID do Tópico no Final do Link ( https://t.me/oakcic/396 ) '396' ">
         </div>
         <button type="button" class="submit-btn" onclick="sendMessage()">Enviar</button>
