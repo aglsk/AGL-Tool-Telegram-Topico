@@ -1,6 +1,7 @@
 # AGL-Tool-Telegram
 
 AGL Tool Telegram foi feito para enviar mensagens para seu grupo ou canal usando seu bot para permanecer anônimo.
+( Obs..: Apenas Para Grupos Com Tópico )
 
 ## Índice
 
