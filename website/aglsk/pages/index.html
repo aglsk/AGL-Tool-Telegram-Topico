@@ -8,11 +8,15 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-            padding-top: 50px;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
         }
         .container {
-            max-width: 400px;
+            max-width: 600px;
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -20,14 +24,14 @@
         }
         .title {
             text-align: center;
-            font-size: 24px;
-            margin-bottom: 20px;
+            font-size: 25px;
+            margin-bottom: 0px;
         }
         .form-group label {
             font-weight: bold;
         }
         .submit-btn {
-            background-color: #4CAF50;
+            background-color: #007bff;
             color: white;
             padding: 12px 20px;
             border: none;
@@ -37,17 +41,18 @@
             width: 100%;
         }
         .submit-btn:hover {
-            background-color: #45a049;
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="title">Enviar Mensagem BOT</div>
+    <div class="title">Enviar Mensagem BOT</div>
     <form id="sendMessageForm">
         <div class="form-group">
             <label for="chatId">ChatID:</label>
-            <input class="form-control" type="text" id="chatId" name="chatId" placeholder="Informe o ChatID(Obs:.. Coloque o '-100' Antes Do ID ) ">
+            <input class="form-control" type="text" id="chatId" name="chatId" value="-100" placeholder="Informe o ChatID (Obs: Coloque o '-100' Antes do ID)">
         </div>
         <div class="form-group">
             <label for="token">Token:</label>
@@ -58,12 +63,53 @@
             <textarea class="form-control" id="message" name="message" rows="4" placeholder="Digite sua mensagem"></textarea>
         </div>
         <div class="form-group">
-            <label for="topicId">ID do Tópico:</label>
-            <input class="form-control" type="text" id="topicId" name="topicId" placeholder="Informe o ID do Tópico no Final do Link ( https://t.me/oakcic/396 ) '396' ">
+            <label>Selecionar tipo de imagem:</label><br>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="imageType" id="imageFile" value="file" checked>
+                <label class="form-check-label" for="imageFile">Arquivo</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="imageType" id="imageUrl" value="url">
+                <label class="form-check-label" for="imageUrl">URL</label>
+            </div>
+        </div>
+        <div class="form-group" id="photoFileGroup">
+            <label for="photo">Foto (opcional):</label>
+            <input class="form-control" type="file" id="photo" name="photo">
+            <small id="photoHelp" class="form-text text-muted">Selecione uma imagem.</small>
+        </div>
+        <div class="form-group" id="photoUrlGroup" style="display: none;">
+            <label for="photoUrl">URL da Imagem:</label>
+            <input class="form-control" type="text" id="photoUrl" name="photoUrl" placeholder="Informe a URL da Imagem">
+        </div>
+        <div class="form-group">
+            <label for="topicId">ID do Tópico (opcional):</label>
+            <input class="form-control" type="text" id="topicId" name="topicId" placeholder="Informe o ID do Tópico (Ex: 396)">
         </div>
         <button type="button" class="submit-btn" onclick="sendMessage()">Enviar</button>
     </form>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="successModalLabel">Sucesso</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Mensagem enviada com sucesso!
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -72,28 +118,79 @@ function sendMessage() {
     var chatId = document.getElementById("chatId").value;
     var token = document.getElementById("token").value;
     var message = document.getElementById("message").value;
-    var topicId = document.getElementById("topicId").value;
+    var imageType = document.querySelector('input[name="imageType"]:checked').value;
+    var formData = new FormData();
 
-    if (chatId.trim() === "" || token.trim() === "" || message.trim() === "" || topicId.trim() === "") {
-        alert("Por favor, preencha todos os campos!");
+    if (chatId.trim() === "" || token.trim() === "" || message.trim() === "") {
+        alert("Por favor, preencha todos os campos obrigatórios!");
         return;
     }
 
-    var request = new XMLHttpRequest();
-    var url = "https://api.telegram.org/bot" + token + "/sendMessage";
-    var params = "chat_id=" + chatId + "&text=" + message + "&message_thread_id=" + topicId;
+    formData.append("chat_id", chatId);
+    formData.append("caption", message);
 
+    if (imageType === "file") {
+        var photo = document.getElementById("photo").files[0];
+        if (!photo) {
+            alert("Por favor, selecione um arquivo de imagem.");
+            return;
+        }
+        formData.append("photo", photo);
+        var url = "https://api.telegram.org/bot" + token + "/sendPhoto";
+    } else if (imageType === "url") {
+        var photoUrl = document.getElementById("photoUrl").value;
+        if (photoUrl.trim() === "") {
+            alert("Por favor, informe a URL da imagem.");
+            return;
+        }
+        formData.append("photo", photoUrl);
+        formData.append("photo_url", "true"); // Indicando que é uma URL de foto
+        var url = "https://api.telegram.org/bot" + token + "/sendPhoto";
+    }
+
+    var topicId = document.getElementById("topicId").value;
+    if (topicId.trim() !== "") {
+        formData.append("message_thread_id", topicId);
+    }
+
+    var request = new XMLHttpRequest();
     request.open("POST", url, true);
-    request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 
     request.onreadystatechange = function() {
-        if (request.readyState === 4 && request.status === 200) {
-            alert("Mensagem enviada com sucesso!");
+        if (request.readyState === 4) {
+            if (request.status === 200) {
+                $('#successModal').modal('show');
+            } else {
+                alert("Erro ao enviar mensagem: " + request.statusText);
+            }
         }
     };
 
-    request.send(params);
+    request.send(formData);
 }
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var imageTypeRadios = document.querySelectorAll('input[name="imageType"]');
+    var photoFileGroup = document.getElementById("photoFileGroup");
+    var photoUrlGroup = document.getElementById("photoUrlGroup");
+
+    function toggleImageInput() {
+        if (document.querySelector('input[name="imageType"]:checked').value === "file") {
+            photoFileGroup.style.display = "block";
+            photoUrlGroup.style.display = "none";
+        } else {
+            photoFileGroup.style.display = "none";
+            photoUrlGroup.style.display = "block";
+        }
+    }
+
+    toggleImageInput();
+
+    imageTypeRadios.forEach(radio => {
+        radio.addEventListener('change', toggleImageInput);
+    });
+});
 </script>
 </body>
 </html>
